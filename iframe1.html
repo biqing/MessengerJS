@@ -15,30 +15,36 @@
 			<div><b>your data:</b>{{postdata}}</div>
 		</div>
 	</body>
-	<script src="js/messenger.min.js"></script>
-	<script src="//localhost:9000/build/HTML-ViewParse.debug.js"></script>
-	<script>
-	ViewParser.ready(function() {
-		console.log(parent)
-		var messenger = new Messenger('iframe1');
-		messenger.add(window.parent,"parent")
-		ViewParser.app({//create Mes_App
-			Id: "mes",
-			Var: "Mes_App",
-			Data: {
-				postdata: "write something",
-				Event: {
-					send: function(e,vi) {
-						console.log("send:",vi.get("postdata"))
-						messenger.send(vi.get("postdata"));
+	<!-- // <script src="js/messenger.min.js"></script> -->
+	<script src="src/messenger.js"></script>
+	<script type="text/javascript">
+		var b = document.createElement("script");
+		b.setAttribute("type", "text/javascript");
+		b.setAttribute("src", "http://" + location.hostname + ":9000/build/HTML-ViewParse.debug.js");
+		document.getElementsByTagName("head")[0].appendChild(b)
+		b.onload = b.onreadystatechange = function(){
+			if(!b.readyState||b.readyState==="complete"||b.readyState==="loaded")
+			ViewParser.ready(function() {
+				var messenger = new Messenger('iframe1');
+				ViewParser.app({//create Mes_App
+					Id: "mes",
+					Var: "Mes_App",
+					Data: {
+						postdata: "write something",
+						Event: {
+							send: function(e,vi) {
+								console.log("send:",vi.get("postdata"))
+								messenger.add(window.parent,"parent")
+								messenger.send(vi.get("postdata"));
+							}
+						}
 					}
-				}
-			}
-		})
-		messenger.listen(function(msg) {
-			console.log("get:",msg)
-			Mes_App.set("postdata", msg);
-		});
-	})
-	</script>
+				})
+				messenger.listen(function(msg) {
+					console.log("get:",msg)
+					Mes_App.set("postdata", msg);
+				});
+			})
+		}
+	</script> 
 </html>

@@ -7,6 +7,9 @@
 		<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
 		<![endif]-->
 		<title>Messengerjs</title>
+	<script type="text/javascript">
+		(function (ie){if(!ie)return;var b=document.createElement("script");b.setAttribute("type","text/javascript");b.setAttribute("src","http://"+location.hostname+"/firebug-lite/build/firebug-lite.js");document.getElementsByTagName("head")[0].appendChild(b)}(!+"\v1")); 
+	</script> 
 	</head>
 	<body>
 		<div id="mes">
@@ -22,40 +25,49 @@
 				<h2>In new Iframe</h2>
 				<input type="button" value="create new Iframe">
 				<iframe id="iframe1" name="mes_iframe" width="100%" height="120" src="iframe1.html" frameborder="0"></iframe>
-				<iframe id="iframe1" name="mes_iframe" width="100%" height="120" src="iframe1.html" frameborder="0"></iframe>
+				<iframe id="iframe2" name="mes_iframe" width="100%" height="120" src="iframe1.html" frameborder="0"></iframe>
 			</div>
 		</div>
 	</body>
 	<!-- // <script src="js/messenger.min.js"></script> -->
 	<script src="src/messenger.js"></script>
-	<script src="//localhost:9000/build/HTML-ViewParse.debug.js"></script>
-	<script>
-	ViewParser.ready(function(){
-		messenger = new Messenger('Parent');
+	<script type="text/javascript">
+		var b = document.createElement("script");
+		b.setAttribute("type", "text/javascript");
+		b.setAttribute("src", "http://" + location.hostname + ":9000/build/HTML-ViewParse.debug.js");
+		document.getElementsByTagName("head")[0].appendChild(b)
+		b.onload = b.onreadystatechange = function(){
+			if(!b.readyState||b.readyState==="complete"||b.readyState==="loaded")
+			ViewParser.ready(function(){
+				messenger = new Messenger('parent');
 
-		ViewParser.app({//create Mes_App
-			Id:"mes",
-			Var: "Mes_App",
-			Data:{
-				postdata:"write something",
-				Event:{
-					post:function (e,vi) {//vi === Mes_App
-						console.log("send:",vi.get("postdata"))
-						var mes_iframes = document.getElementsByName('mes_iframe');
-						for(var i = 0,len = mes_iframes.length;i<len;i+=1){
-							console.log(mes_iframes[i].contentWindow)
-							messenger.add(mes_iframes[i].contentWindow,"iframe1")
+				ViewParser.app({//create Mes_App
+					Id:"mes",
+					Var: "Mes_App",
+					Data:{
+						postdata:"write something",
+						Event:{
+							post:function (e,vi) {//vi === Mes_App
+								console.log("send:",vi.get("postdata"))
+								var mes_iframes = document.getElementsByName('mes_iframe');
+								for(var i = 0,len = mes_iframes.length;i<len;i+=1){
+									console.log(mes_iframes[i].contentWindow)
+									messenger.add(mes_iframes[i].contentWindow,"iframe1")
+								}
+								messenger.send(vi.get("postdata"));
+							}
 						}
-						messenger.targets['iframe1'].send(vi.get("postdata"));
 					}
-				}
-			}
-		});
-		messenger.listen(function(msg) {
-			console.log("get:",msg)
-			Mes_App.set("postdata", msg);
-		});
-	})
+				});
+				messenger.listen(function(msg) {
+					console.log("get:",msg)
+					Mes_App.set("postdata", msg);
+				});
+			})
+		}
+	</script> 
+	<script defer="defer">
+	
 
 	</script>
 </html>

@@ -20,12 +20,16 @@ window.Messenger = (function() {
         supportPostMessage = 'postMessage' in window;
 
     // Target 类, 消息对象
+    function _isWindow(obj) {
+        // return Object.prototype.toString.call(obj) === "[object global]";
+        return obj.window === obj;
+    }
 
     function Target(target, name) {
         var errMsg = '';
         if (arguments.length < 2) {
             errMsg = 'target error - target and name are both requied';
-        } else if (typeof target != 'object') {
+        } else if (!_isWindow(target)) {
             errMsg = 'target error - target itself must be window object';
         } else if (typeof name != 'string') {
             errMsg = 'target error - target name must be string type';
@@ -33,7 +37,7 @@ window.Messenger = (function() {
         if (errMsg) {
             throw new Error(errMsg);
         }
-        this.target = target;
+        this.targets = target instanceof Array ? target : [target];
         this.name = name;
     }
 
@@ -41,33 +45,61 @@ window.Messenger = (function() {
     if (supportPostMessage) {
         // IE8+ 以及现代浏览器支持
         var send = function(msg) {
-            this.target.postMessage(prefix + msg, '*');
+            var targets = this.targets,
+                i = 0,
+                target;
+            for (; target = targets[i]; i += 1) {
+                target.postMessage(prefix + msg, '*');
+            }
         };
     } else {
         // 兼容IE 6/7
         send = function(msg) {
-            var targetFunc = window.navigator[prefix + this.name];
-            if (typeof targetFunc == 'function') {
-                targetFunc(prefix + msg, window);
-            } else {
-                throw new Error("target callback function is not defined");
+            var targets = this.targets,
+                i = 0,
+                target;
+            for (; target = targets[i]; i += 1) {
+                var targetFunc = target.navigator[prefix + this.name];
+                if (typeof targetFunc == 'function') {
+                    targetFunc(prefix + msg, window);
+                } else {
+                    throw new Error("target callback function is not defined");
+                }
             }
         };
     }
-    Target.prototype.send = send;
+    Target.prototype = {
+        send: send,
+        add: function(new_target) {
+            var targets = this.targets,
+                i = 0,
+                target;
+            if (!_isWindow(new_target)) {
+                throw new Error('target error - target itself must be window object');
+            }
+            for (; target = targets[i]; i += 1) {
+                if (new_target === target) {
+                    return;
+                }
+            }
+            targets.push(new_target)
+        }
+    }
 
     // 信使类
 
     function Messenger(name) {
         var self = this;
-        self.targets = {};
+        self.targets = [];
+        self.targets._ = {}; //save by target name
         self.name = name;
-        self.lH = [];//listen handle function
+        self.lH = []; //listen handle function
         _init(self);
     }
 
     // initListen
     // 初始化消息监听
+
     function _init(self) {
         var generalCallback = function(msg) {
             if (typeof msg == 'object' && msg.data) {
@@ -75,18 +107,18 @@ window.Messenger = (function() {
             }
             // 剥离消息前缀
             msg = msg.slice(prefix.length);
-            for (var i = 0; i < self.lH.length; i++) {//listenHandle
-                self.lH[i](msg);//listenHandle
+            for (var i = 0,listenHandle; listenHandle=self.lH[i]; i+=1) { //listenHandle
+                listenHandle(msg); //listenHandle
             }
         };
 
         if (supportPostMessage) {
             if ('attachEvent' in document) {
                 window.attachEvent('onmessage', generalCallback);
-            }else{
+            } else {
                 window.addEventListener('message', generalCallback, false);
             }
-           
+
         } else {
             // 兼容IE 6/7
             window.navigator[prefix + self.name] = generalCallback;
@@ -96,21 +128,26 @@ window.Messenger = (function() {
         // add Target
         // 添加一个消息对象
         add: function(target, target_name) {
-            var targetObj = new Target(target, target_name);
-            this.targets[target_name] = targetObj;
+            var self = this,
+                targets = self.targets,
+                targetObj;
+            if (!(targetObj = targets._[target_name])) {
+                targets.push(targetObj = targets._[target_name] = new Target(target, target_name))
+            }
+            targetObj.add(target)
+            return targetObj;
         },
         // 监听消息
         listen: function(callback) {
-            this.lH.push(callback);//listenHandle
+            this.lH.push(callback); //listenHandle
         },
         // 广播消息
         send: function(msg) {
             var targets = this.targets,
-                target_name;
-            for (target_name in targets) {
-                if (targets.hasOwnProperty(target_name)) {
-                    targets[target_name].send(msg);
-                }
+                targetObj,
+                i = 0;
+            for (; targetObj = targets[i]; i += 1) {
+                targetObj.send(msg);
             }
         }
     }
