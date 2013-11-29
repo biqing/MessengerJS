@@ -1,0 +1,25 @@
+{
+  "name": "MessengerJS",
+  "version": "2.0",
+  "description": "一个通用的跨域解决方案",
+  "dependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-jshint": "~0.6.0",
+    "grunt-contrib-nodeunit": "~0.2.0",
+    "grunt-contrib-uglify": "~0.2.2",
+    "grunt-contrib-concat": "~0.3.0",
+    "grunt-contrib-watch": "*",
+    "connect-livereload": "*",
+    "grunt-contrib-connect": "*",
+    "grunt-wrap": "*",
+    "grunt-notify": "*"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "javascript"
+  ],
+  "author": ["biqing", "Gaubee"],
+  "license": "MIT"
+}
