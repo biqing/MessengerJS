@@ -1,34 +1,36 @@
 /**
- *     __  ___                                                 
+ *     __  ___
  *    /  |/  /___   _____ _____ ___   ____   ____ _ ___   _____
  *   / /|_/ // _ \ / ___// ___// _ \ / __ \ / __ `// _ \ / ___/
- *  / /  / //  __/(__  )(__  )/  __// / / // /_/ //  __// /    
- * /_/  /_/ \___//____//____/ \___//_/ /_/ \__, / \___//_/     
- *                                        /____/               
- * 
+ *  / /  / //  __/(__  )(__  )/  __// / / // /_/ //  __// /
+ * /_/  /_/ \___//____//____/ \___//_/ /_/ \__, / \___//_/
+ *                                        /____/
+ *
  * @description MessengerJS, a common cross-document communicate solution.
  * @author biqing kwok
- * @version 2.0
+ * @author Gaubee
+ * @version 2.1
  * @license release under MIT license
  */
 
-window.Messenger = (function(){
+window.Messenger = (function() {
 
     // 消息前缀, 建议使用自己的项目名, 避免多项目之间的冲突
     var prefix = "[PROJECT_NAME]",
         supportPostMessage = 'postMessage' in window;
 
     // Target 类, 消息对象
-    function Target(target, name){
+
+    function Target(target, name) {
         var errMsg = '';
-        if(arguments.length < 2){
+        if (arguments.length < 2) {
             errMsg = 'target error - target and name are both requied';
-        } else if (typeof target != 'object'){
+        } else if (typeof target != 'object') {
             errMsg = 'target error - target itself must be window object';
-        } else if (typeof name != 'string'){
+        } else if (typeof name != 'string') {
             errMsg = 'target error - target name must be string type';
         }
-        if(errMsg){
+        if (errMsg) {
             throw new Error(errMsg);
         }
         this.target = target;
@@ -36,78 +38,82 @@ window.Messenger = (function(){
     }
 
     // 往 target 发送消息, 出于安全考虑, 发送消息会带上前缀
-    if ( supportPostMessage ){
+    if (supportPostMessage) {
         // IE8+ 以及现代浏览器支持
-        Target.prototype.send = function(msg){
+        var send = function(msg) {
             this.target.postMessage(prefix + msg, '*');
         };
     } else {
         // 兼容IE 6/7
-        Target.prototype.send = function(msg){
+        send = function(msg) {
             var targetFunc = window.navigator[prefix + this.name];
-            if ( typeof targetFunc == 'function' ) {
+            if (typeof targetFunc == 'function') {
                 targetFunc(prefix + msg, window);
             } else {
                 throw new Error("target callback function is not defined");
             }
         };
     }
-   
+    Target.prototype.send = send;
+
     // 信使类
-    function Messenger(name){
-        this.targets = {};
-        this.name = name;
-        this.listenFunc = [];
-        this.initListen();
+
+    function Messenger(name) {
+        var self = this;
+        self.targets = {};
+        self.name = name;
+        self.lH = [];//listen handle function
+        _init(self);
     }
 
-    // 添加一个消息对象
-    Messenger.prototype.addTarget = function(target, name){
-        var targetObj = new Target(target, name);
-        this.targets[name] = targetObj;
-    };
-
+    // initListen
     // 初始化消息监听
-    Messenger.prototype.initListen = function(){
-        var self = this;
-        var generalCallback = function(msg){
-            if(typeof msg == 'object' && msg.data){
+    function _init(self) {
+        var generalCallback = function(msg) {
+            if (typeof msg == 'object' && msg.data) {
                 msg = msg.data;
             }
             // 剥离消息前缀
             msg = msg.slice(prefix.length);
-            for(var i = 0; i < self.listenFunc.length; i++){
-                self.listenFunc[i](msg);
+            for (var i = 0; i < self.lH.length; i++) {//listenHandle
+                self.lH[i](msg);//listenHandle
             }
         };
 
-        if ( supportPostMessage ){
-            if ( 'addEventListener' in document ) {
-                window.addEventListener('message', generalCallback, false);
-            } else if ( 'attachEvent' in document ) {
+        if (supportPostMessage) {
+            if ('attachEvent' in document) {
                 window.attachEvent('onmessage', generalCallback);
+            }else{
+                window.addEventListener('message', generalCallback, false);
             }
+           
         } else {
             // 兼容IE 6/7
-            window.navigator[prefix + this.name] = generalCallback;
+            window.navigator[prefix + self.name] = generalCallback;
         }
-    };
-
-    // 监听消息
-    Messenger.prototype.listen = function(callback){
-        this.listenFunc.push(callback);
-    };
-
-    // 广播消息
-    Messenger.prototype.send = function(msg){
-        var targets = this.targets,
-            target;
-        for(target in targets){
-            if(targets.hasOwnProperty(target)){
-                targets[target].send(msg);
+    }
+    Messenger.prototype = {
+        // add Target
+        // 添加一个消息对象
+        add: function(target, target_name) {
+            var targetObj = new Target(target, target_name);
+            this.targets[target_name] = targetObj;
+        },
+        // 监听消息
+        listen: function(callback) {
+            this.lH.push(callback);//listenHandle
+        },
+        // 广播消息
+        send: function(msg) {
+            var targets = this.targets,
+                target_name;
+            for (target_name in targets) {
+                if (targets.hasOwnProperty(target_name)) {
+                    targets[target_name].send(msg);
+                }
             }
         }
-    };
+    }
 
     return Messenger;
 })();

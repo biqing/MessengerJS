@@ -6,12 +6,12 @@
 		<!--[if lt IE 9]>
 		<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
 		<![endif]-->
-		<title>Messengerjs by biqing and Gaubee</title>
+		<title>Messengerjs</title>
 	</head>
 	<body>
 		<div id="mes">
 			<input type="text" attr-value="{{postdata}}" bind-form="{{'postdata'}}">
-			<input type="button" value="Send Mes" event-click="{{Event.post}}">
+			<input type="button" value="Send Mes" event-click="{{'Event.post'}}">
 			<div><b>your data:</b>{{postdata}}</div>
 			<hr>
 			<div>
@@ -21,24 +21,41 @@
 			<div>
 				<h2>In new Iframe</h2>
 				<input type="button" value="create new Iframe">
+				<iframe id="iframe1" name="mes_iframe" width="100%" height="120" src="iframe1.html" frameborder="0"></iframe>
+				<iframe id="iframe1" name="mes_iframe" width="100%" height="120" src="iframe1.html" frameborder="0"></iframe>
 			</div>
 		</div>
 	</body>
-	<script src="js/messenger.min.js"></script>
+	<!-- // <script src="js/messenger.min.js"></script> -->
+	<script src="src/messenger.js"></script>
 	<script src="//localhost:9000/build/HTML-ViewParse.debug.js"></script>
 	<script>
 	ViewParser.ready(function(){
-		ViewParser.app({
+		messenger = new Messenger('Parent');
+
+		ViewParser.app({//create Mes_App
 			Id:"mes",
+			Var: "Mes_App",
 			Data:{
 				postdata:"write something",
 				Event:{
-					post:function (argument) {
-						console.log("post")
+					post:function (e,vi) {//vi === Mes_App
+						console.log("send:",vi.get("postdata"))
+						var mes_iframes = document.getElementsByName('mes_iframe');
+						for(var i = 0,len = mes_iframes.length;i<len;i+=1){
+							console.log(mes_iframes[i].contentWindow)
+							messenger.add(mes_iframes[i].contentWindow,"iframe1")
+						}
+						messenger.targets['iframe1'].send(vi.get("postdata"));
 					}
 				}
 			}
-		})
+		});
+		messenger.listen(function(msg) {
+			console.log("get:",msg)
+			Mes_App.set("postdata", msg);
+		});
 	})
+
 	</script>
 </html>
