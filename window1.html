@@ -10,7 +10,7 @@
 	</head>
 	<body>
 		<div id="mes">
-		    <h3>In Iframe</h3>
+		    <h3>In Window</h3>
 			<input type="text" event-input="{{'Event.send'}}" attr-value="{{postdata}}" bind-form="{{'postdata'}}"><!-- 事件运行顺序和书写顺序有关 -->
 			<div><b>your data:</b>{{postdata}}</div>
 		</div>
@@ -20,7 +20,7 @@
 	<script src="js/HTML-ViewParse.debug.js"></script>
 	<script type="text/javascript">
 		ViewParser.ready(function() {
-			var messenger = new Messenger('iframe1');
+			var messenger = new Messenger('window1');
 			ViewParser.app({//create Mes_App
 				Id: "mes",
 				Var: "Mes_App",

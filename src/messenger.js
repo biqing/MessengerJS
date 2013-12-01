@@ -13,32 +13,34 @@
  * @license release under MIT license
  */
 
-window.Messenger = (function() {
+;
+(function(global) {
 
     // 消息前缀, 建议使用自己的项目名, 避免多项目之间的冲突
     var prefix = "[PROJECT_NAME]",
         supportPostMessage = 'postMessage' in window;
 
     // Target 类, 消息对象
+
     function _isWindow(obj) {
         // return Object.prototype.toString.call(obj) === "[object global]";
-        return obj.window === obj;
+        return obj && obj.window === obj;
     }
 
     function Target(target, name) {
-        var errMsg = '';
+        var self = this,
+            errMsg = '';
         if (arguments.length < 2) {
             errMsg = 'target error - target and name are both requied';
-        } else if (!_isWindow(target)) {
-            errMsg = 'target error - target itself must be window object';
         } else if (typeof name != 'string') {
             errMsg = 'target error - target name must be string type';
         }
         if (errMsg) {
             throw new Error(errMsg);
         }
-        this.targets = target instanceof Array ? target : [target];
-        this.name = name;
+        self.targets = [];
+        self.name = name;
+        self.add(target)
     }
 
     // 往 target 发送消息, 出于安全考虑, 发送消息会带上前缀
@@ -75,7 +77,12 @@ window.Messenger = (function() {
                 i = 0,
                 target;
             if (!_isWindow(new_target)) {
-                throw new Error('target error - target itself must be window object');
+                console.log(new_target.contentWindow)
+                if (new_target && _isWindow(new_target.contentWindow)) {
+                    new_target = new_target.contentWindow;
+                } else {
+                    throw new Error('target error - target itself must be window object');
+                }
             }
             for (; target = targets[i]; i += 1) {
                 if (new_target === target) {
@@ -87,8 +94,7 @@ window.Messenger = (function() {
     }
 
     // 信使类
-
-    function Messenger(name) {
+    global.Messenger = function Messenger(name) {
         var self = this;
         self.targets = [];
         self.targets._ = {}; //save by target name
@@ -107,7 +113,7 @@ window.Messenger = (function() {
             }
             // 剥离消息前缀
             msg = msg.slice(prefix.length);
-            for (var i = 0,listenHandle; listenHandle=self.lH[i]; i+=1) { //listenHandle
+            for (var i = 0, listenHandle; listenHandle = self.lH[i]; i += 1) { //listenHandle
                 listenHandle(msg); //listenHandle
             }
         };
@@ -137,6 +143,15 @@ window.Messenger = (function() {
             targetObj.add(target)
             return targetObj;
         },
+        //[target,] target_name
+        addParent: function(target, target_name) {
+            if (arguments.length === 1) {
+                target_name = target
+                target = global;
+            }
+            target = _isWindow(target.opener) ? target.opener : target.parent;
+            this.add(target, target_name);
+        },
         // 监听消息
         listen: function(callback) {
             this.lH.push(callback); //listenHandle
@@ -153,4 +168,4 @@ window.Messenger = (function() {
     }
 
     return Messenger;
-})();
+})(window);
