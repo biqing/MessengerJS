@@ -50,12 +50,18 @@ Since modern browsers have native cross-document communication method(the PostMe
 4. 父窗口想给iframe发消息, 它怎么知道iframe的存在呢? 添加一个消息对象吧.
 
 		// 父窗口中 - 添加消息对象, 明确告诉父窗口iframe的window引用与名字
-		messenger.addTarget(iframe1.contentWindow, 'iframe1');
+		messenger.add(iframe1.contentWindow, 'iframe1');
 
 		// 父窗口中 - 可以添加多个消息对象
-		messenger.addTarget(iframe2.contentWindow, 'iframe2');
+		// 另外，如果不是window对象，也是能自动尝试获取window对象的
+		messenger.add(iframe2, 'iframe2');
 
-5. 一切ready, 发消息吧~ 发送消息有两种方式. (以父窗口向iframe发消息为例)
+5. iframe或者子窗口想给父窗发消息，默认为你指定父对象，但名字还是要给的.
+
+        //如果是子窗就指定父是window.opener，iframe的话就是window.parent
+        messenger.addParent('Parent');
+
+6. 一切ready, 发消息吧~ 发送消息有两种方式. (以父窗口向iframe发消息为例)
 
 		// 父窗口中 - 向单个iframe发消息
 		messenger.targets['iframe1'].send(msg1);
@@ -64,10 +70,10 @@ Since modern browsers have native cross-document communication method(the PostMe
 		// 父窗口中 - 向所有目标iframe广播消息
 		messenger.send(msg);
 
-6. 现在看到iframe收到消息的alert提示了吗?
 		
 ## Demo ##
-<a href="http://biqing.github.io/labs/messenger/parent.html">http://biqing.github.io/labs/messenger/parent.html</a>
+1. <a href="http://biqing.github.io/labs/messenger/parent.html">http://biqing.github.io/labs/messenger/parent.html</a>
+2. [下载项目](https://github.com/Gaubee/MessengerJS/archive/2.1.zip)，打开index.html页面体验一把吧。
 
 ## 问题与建议 ##
 使用中难免遇到问题, 欢迎提问与建议 : )
