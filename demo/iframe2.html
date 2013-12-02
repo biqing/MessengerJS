@@ -4,42 +4,29 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>iframe communication (parent page)</title>
+    <title>iframe communication (iframe page)</title>
     <script src="messenger.js"></script>
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
-    <style>
-        iframe {
-            margin: 10px;
-            margin-left: 0;
-        }
-    </style>
 </head>
 <body>
 <div class="container">
-    <h1>Demo of MessengerJS</h1>
-    <p class="lead">Project page: <a href="http://biqing.github.io/MessengerJS/">Github page</a></p>
     <p>
-        <span class="label label-danger">parent</span>
-        Domain of the parent page
+        <span class="label label-danger">iframe2</span>
+        This is a iframe under the domain: 
         <script>document.write('(' + location.protocol + '//' + location.host + ')');</script>
-    </p>
-    <p>
-        <iframe id="iframe1" src="http://biqinglabs.duapp.com/messenger/iframe.html" width="550px" height="300px"></iframe>
-        <iframe id="iframe2" src="http://biqingblog.duapp.com/messenger/iframe.html" width="550px" height="300px"></iframe>
     </p>
 
     <p>
         <input type="text" placeholder="输入消息" id="message" />
+        <button type="button" class="btn btn-primary" onclick="sendMessage('parent');">send to parent</button>
         <button type="button" class="btn btn-primary" onclick="sendMessage('iframe1');">send to iframe1</button>
-        <button type="button" class="btn btn-primary" onclick="sendMessage('iframe2');">send to iframe2</button>
         <button type="button" class="btn btn-success" onclick="sendAll();">send to all</button>
     </p>
     <pre id="output" class="alert alert-warning"></pre>
 </div>
+
 <script>
-    var messenger = new Messenger('parent'),
-        iframe1 = document.getElementById('iframe1'),
-        iframe2 = document.getElementById('iframe2'),
+    var messenger = new Messenger('iframe2'),
         input = document.getElementById('message');
 
     messenger.listen(function (msg) {
@@ -48,8 +35,8 @@
         document.getElementById('output').appendChild(text);
     });
 
-    messenger.addTarget(iframe1.contentWindow, 'iframe1');
-    messenger.addTarget(iframe2.contentWindow, 'iframe2');
+    messenger.addTarget(window.parent, 'parent');
+    messenger.addTarget(window.parent.frames[0], 'iframe1');
 
     function sendMessage(name) {
         var msg = input.value;
@@ -59,7 +46,7 @@
 
     function sendAll() {
         var msg = input.value;
-        messenger.send(message.value);
+        messenger.send(msg);
         input.value = '';
     }
 </script>
