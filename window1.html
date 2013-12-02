@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<head>
+	<meta charset='utf-8'>
+	<meta http-equiv="X-UA-Compatible" content="chrome=1">
+	<link type="text/css" href="css/index.css" media="screen" />
+		<!--[if lt IE 9]>
+		<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+		<title>Messengerjs</title>
+	</head>
+	<body>
+		<div id="mes">
+		    <h3>In Window</h3>
+			<input type="text" event-input="{{'Event.send'}}" attr-value="{{postdata}}" bind-form="{{'postdata'}}"><!-- 事件运行顺序和书写顺序有关 -->
+			<div><b>your data:</b>{{postdata}}</div>
+		</div>
+	</body>
+	<!-- // <script src="js/messenger.min.js"></script> -->
+	<script src="src/messenger.js"></script>
+	<script src="js/HTML-ViewParse.debug.js"></script>
+	<script type="text/javascript">
+		ViewParser.ready(function() {
+			var messenger = new Messenger('window1');
+			ViewParser.app({//create Mes_App
+				Id: "mes",
+				Var: "Mes_App",
+				Data: {
+					postdata: "write something",
+					Event: {
+						send: function(e,vi) {
+							console.log("send:",vi.get("postdata"))
+							messenger.addParent("parent")
+							messenger.send(vi.get("postdata"));
+						}
+					}
+				}
+			})
+			messenger.listen(function(msg) {
+				console.log("get:",msg)
+				Mes_App.set("postdata", msg);
+			});
+		})
+	</script> 
+</html>
