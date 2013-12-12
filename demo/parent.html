@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>iframe communication (parent page)</title>
+    <title>Demo - MessengerJS</title>
     <script src="messenger.js"></script>
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
     <style>
@@ -17,7 +16,7 @@
 <body>
 <div class="container">
     <h1>Demo of MessengerJS</h1>
-    <p class="lead">Project page: <a href="http://biqing.github.io/MessengerJS/">Github page</a></p>
+    <p class="lead"><a href="http://biqing.github.io/MessengerJS/">Github project page</a></p>
     <p>
         <span class="label label-danger">parent</span>
         Domain of the parent page
@@ -33,6 +32,7 @@
         <button type="button" class="btn btn-primary" onclick="sendMessage('iframe1');">send to iframe1</button>
         <button type="button" class="btn btn-primary" onclick="sendMessage('iframe2');">send to iframe2</button>
         <button type="button" class="btn btn-success" onclick="sendAll();">send to all</button>
+        <button type="button" id="child" class="btn btn-info" onclick="openWindow();">open a window</button>
     </p>
     <pre id="output" class="alert alert-warning"></pre>
 </div>
@@ -53,14 +53,23 @@
 
     function sendMessage(name) {
         var msg = input.value;
-        messenger.targets[name].send(msg);
+        messenger.targets[name].send("message from parent: " + msg);
         input.value = '';
     }
 
     function sendAll() {
         var msg = input.value;
-        messenger.send(message.value);
+        messenger.send("message from parent: " + msg);
         input.value = '';
+    }
+
+    function openWindow() {
+        var outerWindow = window.open("http://biqinglabs.duapp.com/messenger/child.html", "_blank", "width=603,height=489,location=yes,status=yes,toolbar=no,resizable=no");
+        messenger.addTarget(outerWindow, 'childWindow');
+        document.getElementById("child").innerHTML = "send to child window";
+        document.getElementById("child").onclick = function(){
+            sendMessage('childWindow');
+        };
     }
 </script>
 </body>
