@@ -97,7 +97,10 @@ window.Messenger = (function(){
     Messenger.prototype.listen = function(callback){
         this.listenFunc.push(callback);
     };
-
+    //注销监听
+    Messenger.prototype.clear = function(){
+        this.listenFunc=[];
+    };
     // 广播消息
     Messenger.prototype.send = function(msg){
         var targets = this.targets,
