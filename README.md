@@ -1,7 +1,7 @@
 # MessengerJS #
 
 ## 跨文档通信解决方案 ##
-Since modern browsers have native cross-document communication method(the PostMeessage API, and the "message" event), this project is primarily for the developers who still need to care about the compatiblity in IE6/7, especially the Chinese developers, I will use Chinese in this document. If you guys wanna learn some more, please leave an [issue](https://github.com/biqing/MessengerJS/issues/new), and I will provide the english version of help.
+Since modern browsers have native cross-document communication method(the PostMeessage API, and the "message" event), this project is primarily for the developers who still need to care about the compatiblity in IE6/7, especially the developers in China, I will use Chinese in this document. If you guys wanna learn some more, please leave an [issue](https://github.com/biqing/MessengerJS/issues/new), and I will provide the english version of help.
 
 ## 适用场景 ##
 此方案适用于以下跨域情形:
@@ -28,18 +28,20 @@ Since modern browsers have native cross-document communication method(the PostMe
 ## 如何使用 ##
 1. 在需要通信的文档中(父窗口和iframe们), 都确保引入MessengerJS
 
-2. 每一个文档(`document`), 都需要自己的`Messenger`与其他文档通信. 即每一个`window`对象都对应着一个, 且仅有一个`Messenger`对象, 该`Messenger`对象会负责当前`window`的所有通信任务. 每个`Messenger`对象都需要唯一的名字, 这样它们才可以知道跟谁通信.
+2. 每一个文档(`document`)，都需要自己的`Messenger`与其他文档通信。即每一个`window`对象都对应着一个，且仅有一个`Messenger`对象，该`Messenger`对象会负责当前`window`的所有通信任务。每个`Messenger`对象都需要**唯一的名字**，这样它们才可以知道跟谁通信。另外，推荐指定**项目名称**（类似命名空间的作用），以增强代码健壮性与组件复用性，避免未来与其他项目冲突。
 
 		// 父窗口中 - 初始化Messenger对象
-		var messenger = new Messenger('Parent');
+		// 推荐指定项目名称, 避免Mashup类应用中, 多个开发商之间的冲突
+		var messenger = new Messenger('Parent', 'MessengerProject');
 
 		// iframe中 - 初始化Messenger对象
-		var messenger = new Messenger('iframe1');
+		// 注意! Messenger之间必须保持项目名称一致, 否则无法匹配通信
+		var messenger = new Messenger('iframe1', 'MessengerProject');
 
 		// 多个iframe, 使用不同的名字
-		var messenger = new Messenger('iframe2');
+		var messenger = new Messenger('iframe2', 'MessengerProject');
 
-3. 在发送消息前, 确保目标文档已经监听了消息事件.
+3. 在发送消息前，确保目标文档已经**监听**了**消息**事件。
 
 		// iframe中 - 监听消息
 		// 回调函数按照监听的顺序执行
@@ -47,7 +49,7 @@ Since modern browsers have native cross-document communication method(the PostMe
 			alert("收到消息: " + msg);
 		});
 
-4. 父窗口想给iframe发消息, 它怎么知道iframe的存在呢? 添加一个消息对象吧.
+4. 父窗口想给iframe发消息，它怎么知道iframe的存在呢？添加一个消息对象吧。
 
 		// 父窗口中 - 添加消息对象, 明确告诉父窗口iframe的window引用与名字
 		messenger.addTarget(iframe1.contentWindow, 'iframe1');
@@ -55,7 +57,7 @@ Since modern browsers have native cross-document communication method(the PostMe
 		// 父窗口中 - 可以添加多个消息对象
 		messenger.addTarget(iframe2.contentWindow, 'iframe2');
 
-5. 一切ready, 发消息吧~ 发送消息有两种方式. (以父窗口向iframe发消息为例)
+5. 一切ready，发消息吧~发送消息有两种方式。 (以父窗口向iframe发消息为例)
 
 		// 父窗口中 - 向单个iframe发消息
 		messenger.targets['iframe1'].send(msg1);
@@ -70,6 +72,6 @@ Since modern browsers have native cross-document communication method(the PostMe
 <a href="http://biqing.github.io/labs/messenger/parent.html">http://biqing.github.io/labs/messenger/parent.html</a>
 
 ## 问题与建议 ##
-使用中难免遇到问题, 欢迎提问与建议 : )
+使用中难免遇到问题，欢迎提问与建议 : )
 
 [提交Issue](https://github.com/biqing/MessengerJS/issues/new)

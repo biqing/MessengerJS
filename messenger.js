@@ -54,11 +54,14 @@ window.Messenger = (function(){
     }
    
     // 信使类
-    function Messenger(name){
+    // 创建Messenger实例时指定, 必须指定Messenger的名字, (可选)指定项目名, 以避免Mashup类应用中的冲突
+    // !注意: 父子页面中projectName必须保持一致, 否则无法匹配
+    function Messenger(messengerName, projectName){
         this.targets = {};
-        this.name = name;
+        this.name = messengerName;
         this.listenFunc = [];
         this.initListen();
+        prefix = projectName || prefix;
     }
 
     // 添加一个消息对象
@@ -97,9 +100,9 @@ window.Messenger = (function(){
     Messenger.prototype.listen = function(callback){
         this.listenFunc.push(callback);
     };
-    //注销监听
+    // 注销监听
     Messenger.prototype.clear = function(){
-        this.listenFunc=[];
+        this.listenFunc = [];
     };
     // 广播消息
     Messenger.prototype.send = function(msg){
