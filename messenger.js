@@ -1,11 +1,11 @@
 /**
- *     __  ___                                                 
+ *     __  ___
  *    /  |/  /___   _____ _____ ___   ____   ____ _ ___   _____
  *   / /|_/ // _ \ / ___// ___// _ \ / __ \ / __ `// _ \ / ___/
- *  / /  / //  __/(__  )(__  )/  __// / / // /_/ //  __// /    
- * /_/  /_/ \___//____//____/ \___//_/ /_/ \__, / \___//_/     
- *                                        /____/               
- * 
+ *  / /  / //  __/(__  )(__  )/  __// / / // /_/ //  __// /
+ * /_/  /_/ \___//____//____/ \___//_/ /_/ \__, / \___//_/
+ *                                        /____/
+ *
  * @description MessengerJS, a common cross-document communicate solution.
  * @author biqing kwok
  * @version 2.0
@@ -52,7 +52,7 @@ window.Messenger = (function(){
             }
         };
     }
-   
+
     // 信使类
     // 创建Messenger实例时指定, 必须指定Messenger的名字, (可选)指定项目名, 以避免Mashup类应用中的冲突
     // !注意: 父子页面中projectName必须保持一致, 否则无法匹配
@@ -60,8 +60,8 @@ window.Messenger = (function(){
         this.targets = {};
         this.name = messengerName;
         this.listenFunc = [];
-        this.initListen();
         prefix = projectName || prefix;
+        this.initListen();
     }
 
     // 添加一个消息对象
