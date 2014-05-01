@@ -3,6 +3,8 @@
 ## 跨文档通信解决方案 ##
 Since modern browsers have native cross-document communication method(the PostMeessage API, and the "message" event), this project is primarily for the developers who still need to care about the compatiblity in IE6/7, especially the developers in China, I will use Chinese in this document. If you guys wanna learn some more, please leave an [issue](https://github.com/biqing/MessengerJS/issues/new), and I will provide the english version of help.
 
+简单地说, 如果你不用兼容IE6/7的iframe通信, 你就不需要这套方案了..
+
 ## 适用场景 ##
 此方案适用于以下跨域情形:
 
@@ -11,7 +13,9 @@ Since modern browsers have native cross-document communication method(the PostMe
 
 *上述所有情况, 都需确保对不同域的页面有修改权限, 并同时加载MessengerJS
 
-常见跨源问题为:
+*IE下不支持跨窗口通信
+
+常见跨源问题有:
 
 - 跨子域
 - 跨全域
@@ -20,7 +24,7 @@ Since modern browsers have native cross-document communication method(the PostMe
 ## 理念: 关于"信使"的一切 ##
 理解设计理念对实际使用有帮助作用, 高手可以直接跳到下方使用说明 : )
 
-在跨文档通信中, 一切消息都是以字符串形式存在, 可以视其为"信件", 因此负责派送和接受信件的角色, 我们称其为"信使"(**Messenger**).
+在跨文档通信中, 一切消息都是以字符串形式存在, 可以视其为"报文", 因此负责派送和接受信件的角色, 我们称其为"信使"(**Messenger**).
 
 **Messenger**的职责很简单, 主要分为 **发送消息**(`send`) 与 **监听消息**(`listen`), 而消息的内容都是字符串. 实际使用中, 最好不要直接使用简单的字符串, 而建议使用结构化的消息(JSON String). 具体逻辑请自行实现: 发送前将json内容stringify, 收到后进行parse, 以实现消息内容的扩展性.
 
@@ -32,14 +36,14 @@ Since modern browsers have native cross-document communication method(the PostMe
 
 		// 父窗口中 - 初始化Messenger对象
 		// 推荐指定项目名称, 避免Mashup类应用中, 多个开发商之间的冲突
-		var messenger = new Messenger('Parent', 'MessengerProject');
+		var messenger = new Messenger('Parent', 'projectName');
 
 		// iframe中 - 初始化Messenger对象
 		// 注意! Messenger之间必须保持项目名称一致, 否则无法匹配通信
-		var messenger = new Messenger('iframe1', 'MessengerProject');
+		var messenger = new Messenger('iframe1', 'projectName');
 
 		// 多个iframe, 使用不同的名字
-		var messenger = new Messenger('iframe2', 'MessengerProject');
+		var messenger = new Messenger('iframe2', 'projectName');
 
 3. 在发送消息前，确保目标文档已经**监听**了**消息**事件。
 
@@ -70,6 +74,9 @@ Since modern browsers have native cross-document communication method(the PostMe
 		
 ## Demo ##
 <a href="http://biqing.github.io/labs/messenger/parent.html">http://biqing.github.io/labs/messenger/parent.html</a>
+
+## 关于消息安全性 ##
+由于任何iframe都可以收到广播的消息，建议传递消息时使用JSON String的形式，使用一个字段做消息有效性的验证。如果怕一个固定值（如项目名）不安全，可以使用一个简单的加密算法，并对业务脚本进行压缩混淆，此时的安全风险可以降到最低。
 
 ## 问题与建议 ##
 使用中难免遇到问题，欢迎提问与建议 : )
