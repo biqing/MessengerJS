@@ -28,7 +28,7 @@ Since modern browsers have native cross-document communication method(the PostMe
 ## 如何使用 ##
 1. 在需要通信的文档中(父窗口和iframe们), 都确保引入MessengerJS
 
-2. 每一个文档(`document`)，都需要自己的`Messenger`与其他文档通信。即每一个`window`对象都对应着一个，且仅有一个`Messenger`对象，该`Messenger`对象会负责当前`window`的所有通信任务。每个`Messenger`对象都需要**唯一的名字**，这样它们才可以知道跟谁通信。另外，推荐指定**项目名称**（类似命名空间的作用），以增强代码健壮性与组件复用性，避免未来与其他项目冲突。
+2. 每一个文档(`document`)，都需要自己的`Messenger`与其他文档通信。即每一个`window`对象都对应着一个，且仅有一个`Messenger`对象，该`Messenger`对象会负责当前`window`的所有通信任务。每个`Messenger`对象都需要**唯一的名字**，这样它们才可以知道跟谁通信。另外，推荐指定**项目名称**（类似命名空间的作用），以增强代码健壮性与组件复用性，避免未来与其他项目冲突。(注意: 项目名称应使用 **字符串类型** )
 
 		// 父窗口中 - 初始化Messenger对象
 		// 推荐指定项目名称, 避免Mashup类应用中, 多个开发商之间的冲突

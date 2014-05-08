@@ -15,6 +15,7 @@
 window.Messenger = (function(){
 
     // 消息前缀, 建议使用自己的项目名, 避免多项目之间的冲突
+    // !注意 消息前缀应使用字符串类型
     var prefix = "[PROJECT_NAME]",
         supportPostMessage = 'postMessage' in window;
 
@@ -61,7 +62,7 @@ window.Messenger = (function(){
         this.name = messengerName;
         this.listenFunc = [];
         this.initListen();
-        prefix = projectName || prefix;
+        prefix = projectName.toString() || prefix;
     }
 
     // 添加一个消息对象
