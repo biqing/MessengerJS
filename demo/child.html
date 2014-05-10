@@ -23,7 +23,7 @@
 </div>
 
 <script>
-    var messenger = new Messenger('childWindow'),
+    var messenger = new Messenger('childWindow', 'MessengerDemo'),
         input = document.getElementById('message');
 
     messenger.listen(function (msg) {

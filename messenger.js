@@ -61,7 +61,10 @@ window.Messenger = (function(){
         this.targets = {};
         this.name = messengerName;
         this.listenFunc = [];
-        prefix = projectName.toString() || prefix;
+        prefix = projectName || prefix;
+        if(typeof prefix !== 'string') {
+            prefix = prefix.toString();
+        }
         this.initListen();
     }
 
