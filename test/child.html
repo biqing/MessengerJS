@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iframe communication (child window page)</title>
+    <script src="messenger.js"></script>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container">
+    <p>
+        <span class="label label-danger">child window</span>
+        This is a child window under the domain: 
+        <script>document.write('(' + location.protocol + '//' + location.host + ')');</script>
+    </p>
+
+    <p>
+        <input type="text" placeholder="输入消息" id="message" />
+        <button type="button" class="btn btn-info" onclick="sendMessage('parent');">send to parent</button>
+    </p>
+    <pre id="output" class="alert alert-warning"></pre>
+</div>
+
+<script>
+    var messenger = new Messenger('childWindow', 'MessengerDemo'),
+        input = document.getElementById('message');
+
+    messenger.listen(function (msg) {
+        var newline = '\n';
+        var text = document.createTextNode(msg + newline);
+        document.getElementById('output').appendChild(text);
+    });
+
+    messenger.addTarget(window.opener, 'parent');
+
+    function sendMessage(name) {
+        var msg = input.value;
+        messenger.targets[name].send("message from childWindow: " + msg);
+        input.value = '';
+    }
+</script>
+</body>
+</html>
