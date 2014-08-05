@@ -87,3 +87,13 @@ $ node server
 使用中难免遇到问题，欢迎提问与建议 : )
 
 [提交Issue](https://github.com/biqing/MessengerJS/issues/new)
+
+# 根据前辈的Messenger写成了Messenger2 #
+支持消息标记，比如监听一个名为 `test`的消息名称，发送的时候只发送消息个`test`的监听事件。
+
+	//iframe 1
+	ifr.listen('test',function(data){
+		console.log('post'+data+'from test');
+	});
+	//iframe 2
+	ifr2.to('ifr',0).post('test','test1');
