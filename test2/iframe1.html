@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+</head>
+<body>
+  <div id="a">0sdasdasdas</div>
+  <script src="./messenger.js"></script>
+  <script>
+    var ifr = new Messenger('ifr');
+    ifr.listen('p',function(data){
+      console.log('post'+data+'from parent');
+      console.log(2)
+    });
+  </script>
+</body>
+</html>
