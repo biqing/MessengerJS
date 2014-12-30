@@ -82,7 +82,7 @@ window.Messenger = (function(){
                 msg = msg.data;
             }
             // 剥离消息前缀
-            msg = msg.slice(prefix.length);
+            msg = msg.slice(prefix.length+3);
             for(var i = 0; i < self.listenFunc.length; i++){
                 self.listenFunc[i](msg);
             }
