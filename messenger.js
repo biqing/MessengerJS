@@ -20,10 +20,10 @@ window.Messenger = (function(){
         supportPostMessage = 'postMessage' in window;
 
     // Target 类, 消息对象
-    function Target(target, name){
+    function Target(target, name, prefix){
         var errMsg = '';
         if(arguments.length < 2){
-            errMsg = 'target error - target and name are both required';
+            errMsg = 'target error - target and name are both requied';
         } else if (typeof target != 'object'){
             errMsg = 'target error - target itself must be window object';
         } else if (typeof name != 'string'){
@@ -34,20 +34,21 @@ window.Messenger = (function(){
         }
         this.target = target;
         this.name = name;
+        this.prefix = prefix;
     }
 
     // 往 target 发送消息, 出于安全考虑, 发送消息会带上前缀
     if ( supportPostMessage ){
         // IE8+ 以及现代浏览器支持
         Target.prototype.send = function(msg){
-            this.target.postMessage(prefix + msg, '*');
+            this.target.postMessage(this.prefix + '|' + this.name + '__Messenger__' + msg, '*');
         };
     } else {
         // 兼容IE 6/7
         Target.prototype.send = function(msg){
-            var targetFunc = window.navigator[prefix + this.name];
+            var targetFunc = window.navigator[this.prefix + this.name];
             if ( typeof targetFunc == 'function' ) {
-                targetFunc(prefix + msg, window);
+                targetFunc(this.prefix + msg, window);
             } else {
                 throw new Error("target callback function is not defined");
             }
@@ -61,16 +62,13 @@ window.Messenger = (function(){
         this.targets = {};
         this.name = messengerName;
         this.listenFunc = [];
-        prefix = projectName || prefix;
-        if(typeof prefix !== 'string') {
-            prefix = prefix.toString();
-        }
+        this.prefix = projectName || prefix;
         this.initListen();
     }
 
     // 添加一个消息对象
     Messenger.prototype.addTarget = function(target, name){
-        var targetObj = new Target(target, name);
+        var targetObj = new Target(target, name,  this.prefix);
         this.targets[name] = targetObj;
     };
 
@@ -81,10 +79,17 @@ window.Messenger = (function(){
             if(typeof msg == 'object' && msg.data){
                 msg = msg.data;
             }
-            // 剥离消息前缀
-            msg = msg.slice(prefix.length);
+            
+            var msgPairs = msg.split('__Messenger__');
+            var msg = msgPairs[1];
+            var pairs = msgPairs[0].split('|');
+            var prefix = pairs[0];
+            var name = pairs[1];
+
             for(var i = 0; i < self.listenFunc.length; i++){
-                self.listenFunc[i](msg);
+                if (prefix + name === self.prefix + self.name) {
+                    self.listenFunc[i](msg);
+                }
             }
         };
 
@@ -96,13 +101,24 @@ window.Messenger = (function(){
             }
         } else {
             // 兼容IE 6/7
-            window.navigator[prefix + this.name] = generalCallback;
+            window.navigator[this.prefix + this.name] = generalCallback;
         }
     };
 
     // 监听消息
     Messenger.prototype.listen = function(callback){
-        this.listenFunc.push(callback);
+        var i = 0;
+        var len = this.listenFunc.length;
+        var cbIsExist = false;
+        for (; i < len; i++) {
+            if (this.listenFunc[i] == callback) {
+                cbIsExist = true;
+                break;
+            }
+        }
+        if (!cbIsExist) {
+            this.listenFunc.push(callback);
+        }
     };
     // 注销监听
     Messenger.prototype.clear = function(){
