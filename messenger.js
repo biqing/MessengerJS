@@ -23,7 +23,7 @@ window.Messenger = (function(){
     function Target(target, name, prefix){
         var errMsg = '';
         if(arguments.length < 2){
-            errMsg = 'target error - target and name are both requied';
+            errMsg = 'target error - target and name are both required';
         } else if (typeof target != 'object'){
             errMsg = 'target error - target itself must be window object';
         } else if (typeof name != 'string'){
