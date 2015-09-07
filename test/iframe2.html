@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iframe communication (iframe page)</title>
+    <script src="messenger.js"></script>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container">
+    <p>
+        <span class="label label-danger">iframe2</span>
+        This is a iframe under the domain: 
+        <script>document.write('(' + location.protocol + '//' + location.host + ')');</script>
+    </p>
+
+    <p>
+        <input type="text" placeholder="输入消息" id="message" />
+        <button type="button" class="btn btn-primary" onclick="sendMessage('parent');">send to parent</button>
+        <button type="button" class="btn btn-primary" onclick="sendMessage('iframe1');">send to iframe1</button>
+        <button type="button" class="btn btn-success" onclick="sendAll();">send to all</button>
+    </p>
+    <pre id="output" class="alert alert-warning"></pre>
+</div>
+
+<script>
+    var messenger = new Messenger('iframe2', 'MessengerDemo'),
+        input = document.getElementById('message');
+
+    messenger.listen(function (msg) {
+        var newline = '\n';
+        var text = document.createTextNode(msg + newline);
+        document.getElementById('output').appendChild(text);
+    });
+
+    messenger.addTarget(window.parent, 'parent');
+    messenger.addTarget(window.parent.frames[0], 'iframe1');
+
+    function sendMessage(name) {
+        var msg = input.value;
+        messenger.targets[name].send("message from iframe2: " + msg);
+        input.value = '';
+    }
+
+    function sendAll() {
+        var msg = input.value;
+        messenger.send("message from iframe2: " + msg);
+        input.value = '';
+    }
+</script>
+</body>
+</html>

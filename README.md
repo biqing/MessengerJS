@@ -71,10 +71,15 @@ Since modern browsers have native cross-document communication method(the PostMe
 		messenger.send(msg);
 
 6. 现在看到iframe收到消息的alert提示了吗?
-		
+
 ## Demo ##
 <a href="http://biqing.github.io/labs/messenger/parent.html">http://biqing.github.io/labs/messenger/parent.html</a>
 
+或者用Node.js开启测试服务器，在`test`文件夹内的:
+``
+$ node server
+``
+然后打开该地址:<a href="http://locallhost:80/">locallhost:80</a>进行测试。
 ## 关于消息安全性 ##
 由于任何iframe都可以收到广播的消息，建议传递消息时使用JSON String的形式，使用一个字段做消息有效性的验证。如果怕一个固定值（如项目名）不安全，可以使用一个简单的加密算法，并对业务脚本进行压缩混淆，此时的安全风险可以降到最低。
 
@@ -82,3 +87,13 @@ Since modern browsers have native cross-document communication method(the PostMe
 使用中难免遇到问题，欢迎提问与建议 : )
 
 [提交Issue](https://github.com/biqing/MessengerJS/issues/new)
+
+# 根据前辈的Messenger写成了Messenger2 #
+支持消息标记，比如监听一个名为 `test`的消息名称，发送的时候只发送消息个`test`的监听事件。
+
+	//iframe 1
+	ifr.listen('test',function(data){
+		console.log('post'+data+'from test');
+	});
+	//iframe 2
+	ifr2.to('ifr',0).post('test','test1');
