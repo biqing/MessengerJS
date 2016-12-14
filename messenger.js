@@ -48,7 +48,7 @@ window.Messenger = (function(){
         Target.prototype.send = function(msg){
             var targetFunc = window.navigator[this.prefix + this.name];
             if ( typeof targetFunc == 'function' ) {
-                targetFunc(this.prefix + msg, window);
+                targetFunc(this.prefix + '|' + this.name + '__Messenger__' + msg, window);
             } else {
                 throw new Error("target callback function is not defined");
             }
@@ -79,7 +79,7 @@ window.Messenger = (function(){
             if(typeof msg == 'object' && msg.data){
                 msg = msg.data;
             }
-            
+
             var msgPairs = msg.split('__Messenger__');
             var msg = msgPairs[1];
             var pairs = msgPairs[0].split('|');
