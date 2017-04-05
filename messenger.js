@@ -76,7 +76,7 @@ window.Messenger = (function(){
     Messenger.prototype.initListen = function(){
         var self = this;
         var generalCallback = function(msg){
-            if(typeof msg == 'object' && msg.data){
+            if(typeof msg == 'object' && typeof msg.data === 'string'){
                 msg = msg.data;
             }
             
